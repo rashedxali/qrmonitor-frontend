@@ -110,15 +110,6 @@ export function AuthForm() {
         })
         router.push("/dashboard")
       } else {
-        if (loginResponse.message === "Please verify your email first!") {
-          toast.error("Account not verified", {
-            description: "Redirecting to verification...",
-          });
-          setEmailForVerification(data.email);
-          handleTabChange("otp");
-          return;
-        }
-
         toast.error(loginResponse.message || "Login failed", {
           description: "Invalid email or password. Please try again.",
         })
@@ -139,16 +130,10 @@ export function AuthForm() {
     try {
       const signUpResponse = await signUpUser(data)
       if (signUpResponse.success) {
-        // Simulate successful signup
         toast.success("Signup successful", {
-          description: "Your account has been created successfully.",
+          description: "Your account has been created. Please log in.",
         })
-
-        toast.success("Signup successful", {
-          description: "Please check your email for the OTP.",
-        })
-        setEmailForVerification(data.email);
-        handleTabChange("otp")
+        handleTabChange("login")
       } else {
         toast.error(signUpResponse.message || "Signup failed", {
           description: "Please try again.",
