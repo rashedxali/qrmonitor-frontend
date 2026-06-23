@@ -30,13 +30,21 @@ export default function CreateQRCodePage() {
     const [qrCodeOptions, setQrCodeOptions] = useState(DEFAULT_QR_OPTIONS)
 
     const validateUrl = (value: string) => {
-        if (!value) {
+        const trimmed = value.trim()
+        if (!trimmed) {
             setUrlError("")
             return false
         }
-        // Strict URL Regex: Requires a domain with at least one dot and typical TLD
-        const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/i
-        const isValid = urlRegex.test(value)
+        // Native URL parse (no ReDoS, accepts query strings). Prepend scheme if missing.
+        const candidate = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`
+        let isValid = false
+        try {
+            const parsed = new URL(candidate)
+            // Require a dotted hostname so bare words ("foo") are rejected.
+            isValid = parsed.hostname.includes(".") && !parsed.hostname.endsWith(".")
+        } catch {
+            isValid = false
+        }
 
         if (isValid) {
             setUrlError("")
